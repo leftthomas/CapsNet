@@ -55,18 +55,23 @@ class Routing(nn.Module):
         pred = [self.W[i](in_vec.squeeze()) for i, group in enumerate(u) for in_vec in group]
         pred = torch.stack([torch.stack(p) for p in pred]).view(self.num_shared * h * w, -1)
         # print(pred.size())
+        # print(pred)
         c = F.softmax(self.b)
         # print(c.size())
+        # print(c)
         s = torch.matmul(c, pred)
         # print(s.size())
+        # print(s)
         v = squash(s.t())
         # print(v.size())
+        # print(v)
         self.b = torch.add(self.b, torch.matmul(pred, v))
+        # print(self.b)
         return v
 
 
 if __name__ == '__main__':
-    l = Routing(4 * 6 * 6, 10, 8, 16, 4)
-    t = Variable(torch.rand(1, 32, 6, 6))
-    for i in range(10):
-        l(t)
+    r = Routing(32 * 6 * 6, 10, 8, 16, 32)
+    t = Variable(torch.rand(1, 256, 6, 6))
+    for _ in range(10):
+        r(t)

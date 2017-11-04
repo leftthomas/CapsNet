@@ -31,7 +31,7 @@ class CapsNet(nn.Module):
         if self.with_reconstruction:
             mask = Variable(torch.zeros(digit_caps.size()))
             mask[:, target.data[0]] = digit_caps[:, target.data[0]]
-            # print(mask.size())
+            # print(mask)
             fc1 = F.relu(self.fc1(mask.view(-1)))
             fc2 = F.relu(self.fc2(fc1))
             reconstruction = F.sigmoid(self.fc3(fc2))
