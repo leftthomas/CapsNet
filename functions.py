@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.autograd import Variable
 
 
@@ -41,13 +42,13 @@ class Routing(nn.Module):
         self.W = [nn.Linear(in_dim, out_dim, bias=False) for _ in range(num_shared)]
         self.b = Variable(torch.zeros(num_out_caps, num_in_caps))
 
-    def forward(self, input):
+    def forward(self, x):
         # TODO: make it work for batch sizes > 1
-        _, in_channels, h, w = input.size()
+        _, in_channels, h, w = x.size()
         assert in_channels == self.num_shared * self.in_dim
 
-        input = input.squeeze().view(self.num_shared, -1, self.in_dim)
-        groups = input.chunk(self.num_shared)
+        x = x.squeeze().view(self.num_shared, -1, self.in_dim)
+        groups = x.chunk(self.num_shared)
         u = [group.squeeze().chunk(h * w) for group in groups]
         pred = [self.W[i](in_vec.squeeze()) for i, group in enumerate(u) for in_vec in group]
         pred = torch.stack([torch.stack(p) for p in pred]).view(self.num_shared * h * w, -1)

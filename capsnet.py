@@ -1,5 +1,7 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 from functions import Routing
 
@@ -18,15 +20,18 @@ class CapsNet(nn.Module):
             self.fc2 = nn.Linear(512, 1024)
             self.fc3 = nn.Linear(1024, 784)
 
-    def forward(self, input, target):
-        conv1 = self.conv1(input)
+    def forward(self, x, target):
+        conv1 = self.conv1(x)
+        # print(conv1.size())
         relu = F.relu(conv1)
         primary_caps = self.primary_caps(relu)
+        print(primary_caps.size())
         digit_caps = self.digit_caps(primary_caps)
-
+        print(digit_caps.size())
         if self.with_reconstruction:
             mask = Variable(torch.zeros(digit_caps.size()))
             mask[:, target.data[0]] = digit_caps[:, target.data[0]]
+            print(mask.size())
             fc1 = F.relu(self.fc1(mask.view(-1)))
             fc2 = F.relu(self.fc2(fc1))
             reconstruction = F.sigmoid(self.fc3(fc2))
@@ -35,9 +40,6 @@ class CapsNet(nn.Module):
 
 
 if __name__ == '__main__':
-    import torch
-    from torch.autograd import Variable
-
     net = CapsNet()
-    x = torch.rand(1, 1, 28, 28)
-    net(Variable(x), Variable(torch.LongTensor(3)))
+    d = torch.rand(1, 1, 28, 28)
+    net(Variable(d), Variable(torch.LongTensor([3])))
