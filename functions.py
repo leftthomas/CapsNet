@@ -48,14 +48,19 @@ class Routing(nn.Module):
         assert in_channels == self.num_shared * self.in_dim
 
         x = x.squeeze().view(self.num_shared, -1, self.in_dim)
+        # print(x.size())
         groups = x.chunk(self.num_shared)
+        # print(groups[0].size())
         u = [group.squeeze().chunk(h * w) for group in groups]
         pred = [self.W[i](in_vec.squeeze()) for i, group in enumerate(u) for in_vec in group]
         pred = torch.stack([torch.stack(p) for p in pred]).view(self.num_shared * h * w, -1)
-
+        # print(pred.size())
         c = F.softmax(self.b)
+        # print(c.size())
         s = torch.matmul(c, pred)
+        # print(s.size())
         v = squash(s.t())
+        # print(v.size())
         self.b = torch.add(self.b, torch.matmul(pred, v))
         return v
 
