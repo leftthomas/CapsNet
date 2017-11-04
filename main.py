@@ -11,13 +11,13 @@ from functions import accuracy
 
 train_loader = DataLoader(datasets.MNIST('data', train=True, download=True, transform=transforms.Compose([
     # transforms.RandomShift(2),
-    transforms.ToTensor()])), shuffle=True)
+    transforms.ToTensor()])), batch_size=1, shuffle=True)
 
-test_loader = DataLoader(datasets.MNIST('data', train=False, transform=transforms
-                                        .Compose([transforms.ToTensor()])))
+test_loader = DataLoader(datasets.MNIST('data', train=False, transform=transforms.Compose([
+    transforms.ToTensor()])), batch_size=1)
 
 model = CapsNet()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+optimizer = optim.Adam(model.parameters())
 margin_loss = DigitMarginLoss()
 reconstruction_loss = torch.nn.MSELoss(size_average=False)
 model.train()
