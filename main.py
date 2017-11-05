@@ -39,10 +39,10 @@ for epoch in range(1, 11):
         target = Variable(target)
         if model.with_reconstruction:
             digit_caps, reconstruction = model(data, target)
-            loss = margin_loss(digit_caps, target)
+            loss = margin_loss(digit_caps, target) + 0.0005 * reconstruction_loss(reconstruction, data.view(-1))
         else:
             digit_caps = model(data, target)
-            loss = margin_loss(digit_caps, target) + 0.0005 * reconstruction_loss(reconstruction, data.view(-1))
+            loss = margin_loss(digit_caps, target)
 
         optimizer.zero_grad()
         loss.backward(retain_graph=True)
