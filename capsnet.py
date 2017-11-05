@@ -35,12 +35,12 @@ class CapsNet(nn.Module):
             fc1 = F.relu(self.fc1(mask.view(-1)))
             fc2 = F.relu(self.fc2(fc1))
             reconstruction = F.sigmoid(self.fc3(fc2))
-
-        return digit_caps, reconstruction
+            return digit_caps, reconstruction
+        return digit_caps
 
 
 if __name__ == '__main__':
     net = CapsNet()
     print(net)
-    d = torch.rand(1, 1, 28, 28)
-    net(Variable(d), Variable(torch.LongTensor([3])))
+    d = torch.rand(3, 1, 28, 28)
+    net(Variable(d), Variable(torch.LongTensor([3, 1, 2])))

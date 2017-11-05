@@ -21,7 +21,7 @@ class DigitMarginLoss(nn.Module):
 
 
 def squash(vec):
-    norm = vec.norm()
+    norm = vec.norm(dim=1, keepdim=True)
     norm_squared = norm ** 2
     coeff = norm_squared / (1 + norm_squared)
     return (coeff / norm) * vec
@@ -40,38 +40,27 @@ class Routing(nn.Module):
         self.num_shared = num_shared
 
         self.W = [nn.Linear(in_dim, out_dim, bias=False) for _ in range(num_shared)]
-        self.b = Variable(torch.zeros(num_out_caps, num_in_caps))
+        self.b = Variable(torch.zeros(num_in_caps, num_out_caps))
 
     def forward(self, x):
-        # TODO: make it work for batch sizes > 1
-        _, in_channels, h, w = x.size()
-        assert in_channels == self.num_shared * self.in_dim
+        batch_size, in_channels, h, w = x.size()
 
-        x = x.squeeze().view(self.num_shared, -1, self.in_dim)
-        # print(x.size())
-        groups = x.chunk(self.num_shared)
-        # print(groups[0].size())
-        u = [group.squeeze().chunk(h * w) for group in groups]
-        pred = [self.W[i](in_vec.squeeze()) for i, group in enumerate(u) for in_vec in group]
-        pred = torch.stack([torch.stack(p) for p in pred]).view(self.num_shared * h * w, -1)
-        # print(pred.size())
-        # print(pred)
-        c = F.softmax(self.b)
-        # print(c.size())
-        # print(c)
-        s = torch.matmul(c, pred)
-        # print(s.size())
-        # print(s)
-        v = squash(s.t())
-        # print(v.size())
-        # print(v)
-        self.b = torch.add(self.b, torch.matmul(pred, v))
-        # print(self.b)
+        for index in range(batch_size):
+            y = x[index]
+            y = y.view(self.num_shared, -1, self.in_dim)
+            groups = y.chunk(self.num_shared)
+            u = [group.squeeze().chunk(h * w) for group in groups]
+            pred = [self.W[i](in_vec.squeeze()) for i, group in enumerate(u) for in_vec in group]
+            pred = torch.stack([torch.stack(p) for p in pred]).view(self.num_shared * h * w, -1)
+            c = F.softmax(self.b)
+            s = torch.matmul(c.t(), pred)
+            v = squash(s)
+            self.b = torch.add(self.b, torch.matmul(pred, v.t()))
         return v
 
 
 if __name__ == '__main__':
     r = Routing(32 * 6 * 6, 10, 8, 16, 32)
-    t = Variable(torch.rand(1, 256, 6, 6))
+    t = Variable(torch.rand(3, 256, 6, 6))
     for _ in range(10):
         r(t)

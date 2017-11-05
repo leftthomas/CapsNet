@@ -4,34 +4,45 @@ import torchvision.transforms as transforms
 from torch.autograd import Variable
 from torch.utils.data.dataloader import DataLoader
 from torchvision import datasets
+from tqdm import tqdm
 
 from capsnet import CapsNet
 from functions import DigitMarginLoss
 from functions import accuracy
 
-train_loader = DataLoader(datasets.MNIST('data', train=True, download=True, transform=transforms.Compose([
+batch_size = 32
+
+train_loader = DataLoader(datasets.MNIST('data', train=True, download=False, transform=transforms.Compose([
     # transforms.RandomShift(2),
-    transforms.ToTensor()])), batch_size=1, shuffle=True)
+    transforms.ToTensor()])), batch_size=batch_size, shuffle=True)
 
 test_loader = DataLoader(datasets.MNIST('data', train=False, transform=transforms.Compose([
-    transforms.ToTensor()])), batch_size=1)
+    transforms.ToTensor()])), batch_size=batch_size)
 
-model = CapsNet()
-optimizer = optim.Adam(model.parameters())
+model = CapsNet(with_reconstruction=False)
+optimizer = optim.Adam(model.parameters(), weight_decay=1e-4)
 margin_loss = DigitMarginLoss()
 reconstruction_loss = torch.nn.MSELoss(size_average=False)
-model.train()
+if torch.cuda.is_available():
+    model.cuda()
+    margin_loss.cuda()
+    reconstruction_loss.cuda()
 
+model.train()
 for epoch in range(1, 11):
-    epoch_tot_loss = 0
     epoch_tot_acc = 0
-    for batch, (data, target) in enumerate(train_loader, 1):
+    bar = tqdm(train_loader, total=len(train_loader), initial=1)
+    for data, target in bar:
+        if torch.cuda.is_available():
+            data, target = data.cuda(), target.cuda()
         data = Variable(data)
         target = Variable(target)
-
-        digit_caps, reconstruction = model(data, target)
-        loss = margin_loss(digit_caps, target) + 0.0005 * reconstruction_loss(reconstruction, data.view(-1))
-        epoch_tot_loss += loss
+        if model.with_reconstruction:
+            digit_caps, reconstruction = model(data, target)
+            loss = margin_loss(digit_caps, target)
+        else:
+            digit_caps = model(data, target)
+            loss = margin_loss(digit_caps, target) + 0.0005 * reconstruction_loss(reconstruction, data.view(-1))
 
         optimizer.zero_grad()
         loss.backward(retain_graph=True)
@@ -39,6 +50,5 @@ for epoch in range(1, 11):
 
         acc = accuracy(digit_caps, target)
         epoch_tot_acc += acc
-
-        template = '[Epoch {}] Loss: {:.4f} ({:.4f}), Acc: {:.2f}%'
-        print(template.format(epoch, loss.data[0], (epoch_tot_loss / batch).data[0], 100 * (epoch_tot_acc / batch)))
+        bar.set_description("epoch: {} [ loss: {:.4f} ] [ acc: {:.2f}% ]".format(epoch, loss.data[0],
+                                                                                 100 * (epoch_tot_acc / batch_size)))
