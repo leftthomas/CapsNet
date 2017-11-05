@@ -30,6 +30,7 @@ if torch.cuda.is_available():
 
 model.train()
 for epoch in range(1, 11):
+    epoch_tot_loss = 0
     epoch_tot_acc = 0
     bar = tqdm(train_loader, total=len(train_loader), initial=1)
     for data, target in bar:
@@ -44,11 +45,12 @@ for epoch in range(1, 11):
             digit_caps = model(data, target)
             loss = margin_loss(digit_caps, target)
 
+        epoch_tot_loss += loss.data[0]
         optimizer.zero_grad()
         loss.backward(retain_graph=True)
         optimizer.step()
 
         acc = accuracy(digit_caps, target)
         epoch_tot_acc += acc
-        bar.set_description("epoch: {} [ loss: {:.4f} ] [ acc: {:.2f}% ]".format(epoch, loss.data[0],
-                                                                                 100 * (epoch_tot_acc / batch_size)))
+    bar.set_description("epoch: {} [ loss: {:.4f} ] [ acc: {:.2f}% ]".format(epoch, epoch_tot_loss / batch_size,
+                                                                             100 * (epoch_tot_acc / batch_size)))
