@@ -27,7 +27,7 @@ python -m visdom.server & python main.py
 Visdom now can be accessed by going to `127.0.0.1:8097` in your browser, or your own host address if specified.
 
 ## Benchmarks
-Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accuracy as shown by the trend of the test accuracy/loss graphs below.
+Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accuracy as shown by the trend of the loss/accuracy graphs below.
 
 <table>
   <tr>
