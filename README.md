@@ -54,11 +54,11 @@ Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accu
 The reconstructions of the digit numbers are showed at right and the ground truth at left.
 <table>
   <tr>
-    <td>
-     <img src="results/ground_truth.jpg"/>
+    <td style="vertical-align:bottom; text-align:center;">
+     <img width="302" height="302" src="results/ground_truth.jpg"/>
     </td>
-    <td>
-     <img src="results/reconstruction.jpg"/>
+    <td style="vertical-align:bottom; text-align:center;">
+     <img width="302" height="302" src="results/reconstruction.jpg"/>
     </td>
   </tr>
 </table>
