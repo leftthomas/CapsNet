@@ -52,15 +52,16 @@ Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accu
 </table>
 
 The reconstructions of the digit numbers are showed at right and the ground truth at left.
+
 <table>
-  <tr>
-    <td style="vertical-align:bottom; text-align:center;">
-     <img width="302" height="302" src="results/ground_truth.jpg"/>
+  <tbody>
+    <td>
+     <img src="results/ground_truth.jpg"/>
     </td>
-    <td style="vertical-align:bottom; text-align:center;">
-     <img width="302" height="302" src="results/reconstruction.jpg"/>
+    <td>
+     <img src="results/reconstruction.jpg"/>
     </td>
-  </tr>
+  </tbody>
 </table>
 
 Default PyTorch Adam optimizer hyperparameters were used with no learning rate scheduling. Epochs with batch size of 100 takes ~2 minutes on a NVIDIA GTX 1070. 
