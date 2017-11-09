@@ -1,46 +1,51 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 from torch.autograd import Variable
 
-from functions import Routing
+import config
+from capsule import CapsuleLayer
 
 
-class CapsNet(nn.Module):
-    def __init__(self, with_reconstruction=True):
-        super(CapsNet, self).__init__()
-        self.with_reconstruction = with_reconstruction
+class CapsuleNet(nn.Module):
+    def __init__(self):
+        super(CapsuleNet, self).__init__()
 
-        self.conv1 = nn.Conv2d(1, 256, 9)
-        self.primary_caps = nn.Conv2d(256, 32 * 8, 9, stride=2)
-        self.digit_caps = Routing(32 * 6 * 6, 10, 8, 16, 32)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=256, kernel_size=9, stride=1)
+        self.primary_capsules = CapsuleLayer(num_capsules=8, num_route_nodes=-1, in_channels=256, out_channels=32,
+                                             kernel_size=9, stride=2)
+        self.digit_capsules = CapsuleLayer(num_capsules=config.NUM_CLASSES, num_route_nodes=32 * 6 * 6, in_channels=8,
+                                           out_channels=16)
 
-        if with_reconstruction:
-            self.fc1 = nn.Linear(160, 512)
-            self.fc2 = nn.Linear(512, 1024)
-            self.fc3 = nn.Linear(1024, 784)
+        self.decoder = nn.Sequential(
+            nn.Linear(16 * config.NUM_CLASSES, 512),
+            nn.ReLU(inplace=True),
+            nn.Linear(512, 1024),
+            nn.ReLU(inplace=True),
+            nn.Linear(1024, 784),
+            nn.Sigmoid()
+        )
 
-    def forward(self, x, target):
-        # print(x.size())
-        x = F.relu(self.conv1(x))
-        # print(x.size())
-        primary_caps = self.primary_caps(x)
-        # print(primary_caps.size())
-        digit_caps = self.digit_caps(primary_caps)
-        # print(digit_caps.size())
-        if self.with_reconstruction:
-            mask = Variable(torch.zeros(digit_caps.size()))
-            mask[:, target.data[0]] = digit_caps[:, target.data[0]]
-            # print(mask)
-            fc1 = F.relu(self.fc1(mask.view(-1)))
-            fc2 = F.relu(self.fc2(fc1))
-            reconstruction = F.sigmoid(self.fc3(fc2))
-            return digit_caps, reconstruction
-        return digit_caps
+    def forward(self, x, y=None):
+        x = F.relu(self.conv1(x), inplace=True)
+        x = self.primary_capsules(x)
+        x = self.digit_capsules(x).squeeze().transpose(0, 1)
+
+        classes = (x ** 2).sum(dim=-1) ** 0.5
+        classes = F.softmax(classes)
+
+        if y is None:
+            # In all batches, get the most active capsule.
+            _, max_length_indices = classes.max(dim=1)
+            if torch.cuda.is_available():
+                y = Variable(torch.eye(config.NUM_CLASSES)).cuda().index_select(dim=0, index=max_length_indices.data)
+            else:
+                y = Variable(torch.eye(config.NUM_CLASSES)).index_select(dim=0, index=max_length_indices.data)
+        reconstructions = self.decoder((x * y[:, :, None]).view(x.size(0), -1))
+
+        return classes, reconstructions
 
 
-if __name__ == '__main__':
-    net = CapsNet()
-    print(net)
-    d = torch.rand(3, 1, 28, 28)
-    net(Variable(d), Variable(torch.LongTensor([3, 1, 2])))
+if __name__ == "__main__":
+    model = CapsuleNet()
+    print(model)
