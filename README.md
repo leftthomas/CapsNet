@@ -32,18 +32,21 @@ Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accu
 <table>
   <tr>
     <td>
-     <img  src="results/train_loss.png"/>
+     <img src="results/train_loss.png"/>
     </td>
     <td>
-     <img  src="results/test_loss.png"/>
+     <img src="results/test_loss.png"/>
     </td>
   </tr>
+</table>
+
+<table>
   <tr>
     <td>
-     <img  src="results/train_acc.png"/>
+     <img src="results/train_acc.png"/>
     </td>
     <td>
-     <img  src="results/test_acc.png"/>
+     <img src="results/test_acc.png"/>
     </td>
   </tr>
 </table>
@@ -51,11 +54,11 @@ Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accu
 The reconstruction of the digit number is showed at right and the ground truth at left.
 <table>
   <tr>
-    <td style="vertical-align:bottom; text-align:center;">
-     <img width="216" height="384" src="results/ground_truth.jpg"/>
+    <td>
+     <img src="results/ground_truth.jpg"/>
     </td>
-    <td style="vertical-align:bottom; text-align:center;">
-     <img width="216" height="384" src="results/reconstruction.jpg"/>
+    <td>
+     <img src="results/reconstruction.jpg"/>
     </td>
   </tr>
 </table>
