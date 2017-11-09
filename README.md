@@ -64,7 +64,7 @@ The reconstructions of the digit numbers are showed at right and the ground trut
   </tr>
 </table>
 
-Default PyTorch Adam optimizer hyperparameters were used with no learning rate scheduling. Epochs with batch size of 100 takes ~2 minutes on a NVIDIA GTX 1070. 
+Default PyTorch Adam optimizer hyperparameters were used with no learning rate scheduling. Epochs with batch size of 100 takes ~2 minutes on a NVIDIA GTX 1070 GPU. 
 
 ## Other Implementations
 - [capsnet.pytorch](https://github.com/andreaazzini/capsnet.pytorch.git)
