@@ -32,16 +32,16 @@ Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accu
 <table>
   <tr>
     <td style="vertical-align:bottom; text-align:center;">
-     <img width="216" height="384" src="results/train_loss.png"/>
+     <img  src="results/train_loss.png"/>
     </td>
     <td style="vertical-align:bottom; text-align:center;">
-     <img width="216" height="384" src="results/test_loss.png"/>
+     <img  src="results/test_loss.png"/>
     </td>
     <td style="vertical-align:bottom; text-align:center;">
-     <img width="216" height="384" src="results/train_acc.png"/>
+     <img  src="results/train_acc.png"/>
     </td>
     <td style="vertical-align:bottom; text-align:center;">
-     <img width="216" height="384" src="results/test_acc.png"/>
+     <img src="results/test_acc.png"/>
     </td>
   </tr>
 </table>
