@@ -56,7 +56,7 @@ The reconstructions of the digit numbers are showed at right and the ground trut
 <table align=center>
   <tr>
     <td width="302"><img src="results/ground_truth.jpg" width="302" height="302"/></td>
-    <td></td>
+   
     <td width="302"><img src="results/reconstruction.jpg" width="302" height="302"/></td>
   </tr>
 </table>
