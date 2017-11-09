@@ -28,7 +28,6 @@ Visdom now can be accessed by going to `127.0.0.1:8097` in your browser, or your
 
 ## Benchmarks
 Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accuracy as shown by the trend of the loss/accuracy graphs below.
-
 <table>
   <tr>
     <td>
@@ -39,7 +38,6 @@ Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accu
     </td>
   </tr>
 </table>
-
 <table>
   <tr>
     <td>
@@ -51,8 +49,10 @@ Highest accuracy was 99.57% after 30 epochs. The model may achieve a higher accu
   </tr>
 </table>
 
-The reconstructions of the digit numbers are showed at right and the ground truth at left.
+The confusion matrix of the digit numbers are showed below.
+<img src="results/confusion_matrix.png"/>
 
+The reconstructions of the digit numbers are showed at right and the ground truth at left.
 <table>
   <tr>
     <td>
