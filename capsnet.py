@@ -38,9 +38,9 @@ class CapsuleNet(nn.Module):
             # In all batches, get the most active capsule.
             _, max_length_indices = classes.max(dim=1)
             if torch.cuda.is_available():
-                y = Variable(torch.eye(config.NUM_CLASSES)).cuda().index_select(dim=0, index=max_length_indices.data)
+                y = Variable(torch.eye(config.NUM_CLASSES)).cuda().index_select(dim=0, index=max_length_indices)
             else:
-                y = Variable(torch.eye(config.NUM_CLASSES)).index_select(dim=0, index=max_length_indices.data)
+                y = Variable(torch.eye(config.NUM_CLASSES)).index_select(dim=0, index=max_length_indices)
         reconstructions = self.decoder((x * y[:, :, None]).view(x.size(0), -1))
 
         return classes, reconstructions
