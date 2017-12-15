@@ -17,7 +17,6 @@ def processor(sample):
     data, labels, training = sample
 
     data = utils.augmentation(data.unsqueeze(1).float() / 255.0)
-    # labels = torch.LongTensor(labels)
     labels = torch.eye(config.NUM_CLASSES).index_select(dim=0, index=labels)
 
     data = Variable(data)

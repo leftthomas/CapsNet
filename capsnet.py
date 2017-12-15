@@ -32,7 +32,7 @@ class CapsuleNet(nn.Module):
         x = self.digit_capsules(x).squeeze().transpose(0, 1)
 
         classes = (x ** 2).sum(dim=-1) ** 0.5
-        classes = F.softmax(classes)
+        classes = F.softmax(classes, dim=-1)
 
         if y is None:
             # In all batches, get the most active capsule.

@@ -29,21 +29,14 @@ class CapsuleLayer(nn.Module):
         scale = squared_norm / (1 + squared_norm)
         return scale * tensor / torch.sqrt(squared_norm)
 
-    @staticmethod
-    def softmax(tensor, dim=1):
-        transposed_input = tensor.transpose(dim, len(tensor.size()) - 1)
-        softmaxed_output = F.softmax(transposed_input.contiguous().view(-1, transposed_input.size(-1)))
-        return softmaxed_output.view(*transposed_input.size()).transpose(dim, len(tensor.size()) - 1)
-
     def forward(self, x):
         if self.num_route_nodes != -1:
-            priors = x[None, :, :, None, :] @ self.route_weights[:, None, :, :, :]
-
+            priors = x.unsqueeze(dim=-2).unsqueeze(dim=0).matmul(self.route_weights.unsqueeze(dim=1))
             logits = Variable(torch.zeros(*priors.size()))
             if torch.cuda.is_available():
                 logits = logits.cuda()
             for i in range(self.num_iterations):
-                probs = self.softmax(logits, dim=2)
+                probs = F.softmax(logits, dim=2)
                 outputs = self.squash((probs * priors).sum(dim=2, keepdim=True))
 
                 if i != self.num_iterations - 1:
