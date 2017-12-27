@@ -17,7 +17,7 @@ class CapsuleLayer(nn.Module):
         self.num_capsules = num_capsules
 
         if num_route_nodes != -1:
-            self.route_weights = nn.Parameter(torch.randn(num_capsules, num_route_nodes, out_channels, in_channels))
+            self.route_weights = nn.Parameter(torch.randn(num_capsules, num_route_nodes, in_channels, out_channels))
         else:
             self.capsules = nn.ModuleList(
                 [nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=0) for _ in
@@ -31,8 +31,7 @@ class CapsuleLayer(nn.Module):
 
     def forward(self, x):
         if self.num_route_nodes != -1:
-            x = x.unsqueeze(dim=-1).unsqueeze(dim=1)
-            priors = self.route_weights.unsqueeze(dim=0).matmul(x).squeeze(dim=-1)
+            priors = x.unsqueeze(dim=-2).unsqueeze(dim=0).matmul(self.route_weights.unsqueeze(dim=1))
             logits = Variable(torch.zeros(*priors.size()))
             if torch.cuda.is_available():
                 logits = logits.cuda()
