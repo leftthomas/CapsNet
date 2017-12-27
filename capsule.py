@@ -37,7 +37,7 @@ class CapsuleLayer(nn.Module):
             if torch.cuda.is_available():
                 logits = logits.cuda()
             for i in range(self.num_iterations):
-                probs = F.softmax(logits, dim=1)
+                probs = F.softmax(logits, dim=2)
                 outputs = self.squash((probs * priors).sum(dim=2, keepdim=True))
 
                 if i != self.num_iterations - 1:
