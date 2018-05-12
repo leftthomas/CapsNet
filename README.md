@@ -1,5 +1,5 @@
 # CapsNet
-A PyTorch implementation of CapsNet based on NIPS2017 paper [Dynamic Routing Between Capsules](https://arxiv.org/abs/1710.09829)
+A PyTorch implementation of CapsNet based on NIPS2017 paper [Dynamic Routing Between Capsules](https://arxiv.org/abs/1710.09829).
 
 ## Requirements
 - [Anaconda](https://www.anaconda.com/download/)
