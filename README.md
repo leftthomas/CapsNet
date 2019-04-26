@@ -12,10 +12,6 @@ conda install pytorch torchvision cuda80 -c soumith # install it if you have ins
 ```
 pip install git+https://github.com/pytorch/tnt.git@master
 ```
-- tqdm
-```
-pip install tqdm
-```
 
 ## Usage
 
